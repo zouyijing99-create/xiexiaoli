@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习资源 - 节能小屋设计师</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #2D7D32;
+            --secondary-green: #4CAF50;
+            --tech-blue: #1976D2;
+            --neutral-gray: #424242;
+            --light-green: #E8F5E8;
+            --light-blue: #E3F2FD;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #E8F5E8 0%, #E3F2FD 100%);
+            min-height: 100vh;
+        }
+        
+        .hero-title {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green), var(--tech-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .resource-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 125, 50, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(45, 125, 50, 0.3);
+            border-color: var(--secondary-green);
+        }
+        
+        .case-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .case-card:hover {
+            border-color: var(--secondary-green);
+            transform: scale(1.02);
+        }
+        
+        .filter-button {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(45, 125, 50, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .filter-button:hover {
+            background: var(--secondary-green);
+            color: white;
+        }
+        
+        .filter-button.active {
+            background: var(--primary-green);
+            color: white;
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-green);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-green);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--secondary-green);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .evaluation-radar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 125, 50, 0.2);
+        }
+        
+        .tech-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary-green), var(--tech-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin: 0 auto 12px;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--secondary-green), var(--tech-blue));
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- 浮动粒子背景 -->
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm border-b border-green-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">🏠</span>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">节能小屋设计师</h1>
+                </div>
+                <div class="flex space-x-8">
+                    <a href="index.html" class="nav-link text-gray-700 font-medium">AI助手</a>
+                    <a href="mindmap.html" class="nav-link text-gray-700 font-medium">思维导图</a>
+                    <a href="resources.html" class="nav-link text-gray-700 font-medium active">学习资源</a>
+                    <a href="api-config.html" class="nav-link text-gray-700 font-medium">API配置</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero区域 -->
+    <section class="pt-8 pb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-6">
+                <h1 class="hero-title text-3xl md:text-4xl font-bold mb-3">
+                    学习资源中心
+                </h1>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    探索节能建筑案例，学习先进技术，掌握评估方法
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要内容区域 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <!-- 案例展示区域 -->
+        <section class="mb-12">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <span class="mr-3">🏗️</span>
+                    优秀节能建筑案例
+                </h2>
+                <div class="flex space-x-2">
+                    <button onclick="filterCases('all')" class="filter-button active px-4 py-2 rounded-lg text-sm font-medium">
+                        全部
+                    </button>
+                    <button onclick="filterCases('residential')" class="filter-button px-4 py-2 rounded-lg text-sm font-medium">
+                        住宅
+                    </button>
+                    <button onclick="filterCases('school')" class="filter-button px-4 py-2 rounded-lg text-sm font-medium">
+                        学校
+                    </button>
+                    <button onclick="filterCases('office')" class="filter-button px-4 py-2 rounded-lg text-sm font-medium">
+                        办公
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="casesContainer">
+                <!-- 案例卡片将通过JavaScript动态生成 -->
+            </div>
+        </section>
+        
+        <!-- 技术知识点区域 -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
+                <span class="mr-3">⚙️</span>
+                节能技术知识库
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="resource-card rounded-2xl p-6 text-center">
+                    <div class="tech-icon">🏠</div>
+                    <h3 class="font-semibold text-gray-800 mb-3">墙体节能技术</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 text-left">
+                        <li>• 外墙保温系统</li>
+                        <li>• 双层墙体结构</li>
+                        <li>• 相变储能材料</li>
+                        <li>• 热桥阻断技术</li>
+                    </ul>
+                    <div class="mt-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>掌握度</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-bar w-3/4"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card rounded-2xl p-6 text-center">
+                    <div class="tech-icon">🪟</div>
+                    <h3 class="font-semibold text-gray-800 mb-3">门窗节能技术</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 text-left">
+                        <li>• 双层中空玻璃</li>
+                        <li>• Low-E低辐射涂层</li>
+                        <li>• 高性能密封条</li>
+                        <li>• 智能遮阳系统</li>
+                    </ul>
+                    <div class="mt-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>掌握度</span>
+                            <span>60%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-bar w-3/5"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card rounded-2xl p-6 text-center">
+                    <div class="tech-icon">☀️</div>
+                    <h3 class="font-semibold text-gray-800 mb-3">太阳能利用</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 text-left">
+                        <li>• 太阳能热水系统</li>
+                        <li>• 光伏发电系统</li>
+                        <li>• 被动式太阳能</li>
+                        <li>• 光热一体化设计</li>
+                    </ul>
+                    <div class="mt-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>掌握度</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-bar w-2/5"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card rounded-2xl p-6 text-center">
+                    <div class="tech-icon">🤖</div>
+                    <h3 class="font-semibold text-gray-800 mb-3">智能控制</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 text-left">
+                        <li>• 智能温控系统</li>
+                        <li>• 自动照明控制</li>
+                        <li>• 能源管理系统</li>
+                        <li>• 物联网传感器</li>
+                    </ul>
+                    <div class="mt-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>掌握度</span>
+                            <span>30%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-bar w-1/3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 评估标准和限制条件 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- 评估标准 -->
+            <section>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="mr-3">📊</span>
+                    项目评估标准
+                </h2>
+                
+                <div class="evaluation-radar rounded-2xl shadow-xl p-6">
+                    <div id="radarChart" style="width: 100%; height: 400px;"></div>
+                    
+                    <div class="mt-6 space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-green-600 font-semibold">30%</span>
+                                <span class="text-sm font-medium">节能效果</span>
+                            </div>
+                            <span class="text-xs text-gray-500">能耗降低、保温性能</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-blue-600 font-semibold">25%</span>
+                                <span class="text-sm font-medium">技术应用</span>
+                            </div>
+                            <span class="text-xs text-gray-500">技术创新性、合理性</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-purple-600 font-semibold">20%</span>
+                                <span class="text-sm font-medium">模型质量</span>
+                            </div>
+                            <span class="text-xs text-gray-500">制作工艺、结构稳定性</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-orange-600 font-semibold">15%</span>
+                                <span class="text-sm font-medium">成本控制</span>
+                            </div>
+                            <span class="text-xs text-gray-500">材料成本、预算管理</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-pink-600 font-semibold">10%</span>
+                                <span class="text-sm font-medium">用户满意度</span>
+                            </div>
+                            <span class="text-xs text-gray-500">居住体验、实用性</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 限制条件分析 -->
+            <section>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="mr-3">⚠️</span>
+                    设计限制条件
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="resource-card rounded-2xl p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-orange-600 text-xl">🧱</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">材料限制</h3>
+                                <p class="text-sm text-gray-600 mb-3">可用材料的性能、成本、环保性要求</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded">成本约束</span>
+                                    <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded">环保要求</span>
+                                    <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded">性能限制</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-card rounded-2xl p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-red-600 text-xl">⏰</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">时间限制</h3>
+                                <p class="text-sm text-gray-600 mb-3">项目周期、制作时间、测试时间安排</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">项目周期</span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">制作时间</span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">测试时间</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-card rounded-2xl p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-yellow-600 text-xl">💸</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">成本限制</h3>
+                                <p class="text-sm text-gray-600 mb-3">预算约束、性价比要求</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">预算限制</span>
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">性价比</span>
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">投资回报</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-card rounded-2xl p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-purple-600 text-xl">🔧</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800 mb-2">技术限制</h3>
+                                <p class="text-sm text-gray-600 mb-3">现有技术水平、制作工艺限制</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">技术水平</span>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">制作工艺</span>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">设备条件</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white/90 backdrop-blur-md border-t border-green-100 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="text-gray-600 text-sm">© 2024 节能小屋设计师 - 专为初中科学教育设计的AI学习工具</p>
+                <p class="text-gray-500 text-xs mt-2">基于绿色科技理念，培养环保创新思维</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 案例数据
+        const cases = [
+            {
+                id: 1,
+                title: '上海被动式节能住宅',
+                type: 'residential',
+                location: '上海',
+                image: 'https://kimi-web-img.moonshot.cn/img/img.freepik.com/2aa1a36d673f2459a90c4279377eeea543f6e6be.jpg',
+                description: '采用被动式设计理念，能耗降低80%以上',
+                tags: ['被动式', '超低能耗', '上海'],
+                energySaving: 85,
+                cost: '中等',
+                technology: ['外墙保温', '三层玻璃', '热回收']
+            },
+            {
+                id: 2,
+                title: '北京绿色学校建筑',
+                type: 'school',
+                location: '北京',
+                image: 'https://kimi-web-img.moonshot.cn/img/www.palmiero-design.co.uk/6ae4f1c9ff14aa8f345bf7f66f9d56f6b7e8a286.jpg',
+                description: '结合教育功能的绿色建筑示范项目',
+                tags: ['教育建筑', '绿色建筑', '北京'],
+                energySaving: 70,
+                cost: '较高',
+                technology: ['太阳能光伏', '雨水收集', '自然通风']
+            },
+            {
+                id: 3,
+                title: '深圳智能办公楼',
+                type: 'office',
+                location: '深圳',
+                image: 'https://kimi-web-img.moonshot.cn/img/img.freepik.com/0161fa51ca6dcffc1314161dbea09f46a421c6fd.jpg',
+                description: '全智能化控制的现代化办公建筑',
+                tags: ['智能化', '现代办公', '深圳'],
+                energySaving: 60,
+                cost: '高',
+                technology: ['智能控制', 'LED照明', '变频空调']
+            },
+            {
+                id: 4,
+                title: '杭州生态住宅小区',
+                type: 'residential',
+                location: '杭州',
+                image: 'https://kimi-web-img.moonshot.cn/img/blog.constellation.com/e52bd09dd6d522c4a56cbd884e3332dd68c3c5dd.png',
+                description: '融合生态理念的住宅小区项目',
+                tags: ['生态住宅', '社区', '杭州'],
+                energySaving: 65,
+                cost: '中等',
+                technology: ['地源热泵', '绿色屋顶', '垂直绿化']
+            },
+            {
+                id: 5,
+                title: '成都零碳实验楼',
+                type: 'school',
+                location: '成都',
+                image: 'https://kimi-web-img.moonshot.cn/img/www.planetcustodian.com/f08ce9be61a0261744874fb13c8ab522e68edf4f.jpg',
+                description: '实现零碳排放的科研实验建筑',
+                tags: ['零碳', '实验楼', '成都'],
+                energySaving: 100,
+                cost: '很高',
+                technology: ['可再生能源', '储能系统', '智能微网']
+            },
+            {
+                id: 6,
+                title: '广州节能改造办公室',
+                type: 'office',
+                location: '广州',
+                image: 'https://kimi-web-img.moonshot.cn/img/upstatehouse.com/76d5ba8a0d5d0ce921ef31322cd5049086179b23.jpg',
+                description: '旧建筑节能改造的成功案例',
+                tags: ['节能改造', '旧建筑', '广州'],
+                energySaving: 50,
+                cost: '低',
+                technology: ['外墙保温', '门窗更换', '照明改造']
+            }
+        ];
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeParticles();
+            renderCases('all');
+            initializeRadarChart();
+            animateProgressBars();
+        });
+        
+        // 创建浮动粒子背景
+        function initializeParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 15;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // 渲染案例
+        function renderCases(filterType) {
+            const container = document.getElementById('casesContainer');
+            const filteredCases = filterType === 'all' ? cases : cases.filter(c => c.type === filterType);
+            
+            container.innerHTML = filteredCases.map(caseItem => `
+                <div class="case-card rounded-2xl overflow-hidden shadow-xl cursor-pointer" onclick="showCaseDetail(${caseItem.id})">
+                    <img src="${caseItem.image}" alt="${caseItem.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-semibold text-gray-800 text-lg">${caseItem.title}</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">${caseItem.location}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">${caseItem.description}</p>
+                        
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-gray-500">节能效果:</span>
+                                <div class="flex items-center">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                                        <div class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: ${caseItem.energySaving}%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-green-600">${caseItem.energySaving}%</span>
+                                </div>
+                            </div>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">${caseItem.cost}</span>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-1">
+                            ${caseItem.tags.map(tag => `<span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // 添加动画
+            anime({
+                targets: '.case-card',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                delay: anime.stagger(100),
+                duration: 600,
+                easing: 'easeOutQuart'
+            });
+        }
+        
+        // 筛选案例
+        function filterCases(type) {
+            // 更新按钮状态
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 重新渲染案例
+            renderCases(type);
+        }
+        
+        // 显示案例详情
+        function showCaseDetail(caseId) {
+            const caseItem = cases.find(c => c.id === caseId);
+            if (caseItem) {
+                // 这里可以实现弹窗显示详情
+                showNotification(`查看案例: ${caseItem.title}`, 'info');
+            }
+        }
+        
+        // 初始化雷达图
+        function initializeRadarChart() {
+            const chartDom = document.getElementById('radarChart');
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                title: {
+                    text: '项目评估雷达图',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 16,
+                        color: '#2D7D32'
+                    }
+                },
+                radar: {
+                    indicator: [
+                        { name: '节能效果', max: 100 },
+                        { name: '技术应用', max: 100 },
+                        { name: '模型质量', max: 100 },
+                        { name: '成本控制', max: 100 },
+                        { name: '用户满意度', max: 100 }
+                    ],
+                    shape: 'polygon',
+                    splitNumber: 4,
+                    axisName: {
+                        color: '#666',
+                        fontSize: 12
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(45, 125, 50, 0.3)'
+                        }
+                    },
+                    splitArea: {
+                        show: true,
+                        areaStyle: {
+                            color: [
+                                'rgba(76, 175, 80, 0.1)',
+                                'rgba(76, 175, 80, 0.05)'
+                            ]
+                        }
+                    }
+                },
+                series: [{
+                    name: '评估得分',
+                    type: 'radar',
+                    data: [{
+                        value: [85, 75, 90, 70, 80],
+                        name: '优秀项目',
+                        areaStyle: {
+                            color: 'rgba(76, 175, 80, 0.3)'
+                        },
+                        lineStyle: {
+                            color: '#4CAF50',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#2D7D32'
+                        }
+                    }]
+                }]
+            };
+            
+            myChart.setOption(option);
+            
+            // 响应式处理
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 动画显示进度条
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach((bar, index) => {
+                anime({
+                    targets: bar,
+                    width: bar.style.width || bar.classList[1],
+                    duration: 1000,
+                    delay: index * 200,
+                    easing: 'easeOutQuart'
+                });
+            });
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                'bg-blue-500'
+            } text-white`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // 动画显示
+            anime({
+                targets: notification,
+                translateX: [300, 0],
+                opacity: [0, 1],
+                duration: 300,
+                easing: 'easeOutQuart'
+            });
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                anime({
+                    targets: notification,
+                    translateX: [0, 300],
+                    opacity: [1, 0],
+                    duration: 300,
+                    easing: 'easeInQuart',
+                    complete: () => {
+                        notification.remove();
+                    }
+                });
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
